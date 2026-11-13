@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>MyContainerPackable</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+class MyContainerPackable implements SysPackable
+{
+    str itemName;
+    int qty;
+
+    #define.CurrentVersion(1)
+    #localmacro.CurrentList
+    itemName,
+    qty
+    #endmacro
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>construct</Name>
+				<Source><![CDATA[
+    public static MyContainerPackable construct(str _itemName, int _qty)
+    {
+        MyContainerPackable packable = new MyContainerPackable();
+
+        packable.parmItemName(_itemName);
+        packable.parmQty(_qty);
+
+        return packable;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>parmItemName</Name>
+				<Source><![CDATA[
+    public str parmItemName(str _itemName = itemName)
+    {
+        itemName = _itemName;
+
+        return itemName;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>parmQty</Name>
+				<Source><![CDATA[
+    public int parmQty(int _qty = qty)
+    {
+        qty = _qty;
+
+        return qty;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>pack</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Saves the state into a container. The version number goes first.
+    /// </summary>
+    public container pack()
+    {
+        return [#CurrentVersion, #CurrentList];
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>unpack</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Restores the state from a container. Returns false if the version is unknown.
+    /// </summary>
+    public boolean unpack(container _packedClass)
+    {
+        int version = conPeek(_packedClass, 1);
+
+        switch (version)
+        {
+            case #CurrentVersion:
+                [version, #CurrentList] = _packedClass;
+                break;
+
+            default:
+                return false;
+        }
+
+        return true;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>
