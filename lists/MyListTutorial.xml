@@ -1,0 +1,724 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>MyListTutorial</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+// The F&O Show - Lists in X++
+class MyListTutorial
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>main</Name>
+				<Source><![CDATA[
+    public static void main(Args _args)
+    {
+        MyListTutorial::part01_createList();
+        MyListTutorial::part02_addStartAndAddEnd();
+        MyListTutorial::part03_duplicatesAllowed();
+        MyListTutorial::part04_enumerator();
+        MyListTutorial::part05_iterator();
+        MyListTutorial::part06_noLookup();
+        MyListTutorial::part07_removeByFiltering();
+        MyListTutorial::part08_appendAndMerge();
+        MyListTutorial::part09_listOfContainers();
+        MyListTutorial::part10_strSplit();
+        MyListTutorial::part11_packAndCreate();
+        MyListTutorial::part12_referenceNotCopy();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>part01_createList</Name>
+				<Source><![CDATA[
+    /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+    // Part 1 - Creating a List
+    private static void part01_createList()
+    {
+        // A List holds values of ONE type, in the order you add them.
+        // You fix that type up front, just like a Map.
+        List fruit = new List(Types::String);
+
+        boolean isEmptyAtStart = fruit.empty();             // true
+        int     countAtStart   = fruit.elements();          // 0
+
+        // addEnd puts each value at the back of the list
+        fruit.addEnd('Apple');
+        fruit.addEnd('Banana');
+        fruit.addEnd('Cherry');
+
+        int     countAfterAdd = fruit.elements();           // 3
+        boolean isEmptyNow    = fruit.empty();              // false
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>part02_addStartAndAddEnd</Name>
+				<Source><![CDATA[
+    /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+    // Part 2 - addStart and addEnd: the order is yours
+    private static void part02_addStartAndAddEnd()
+    {
+        List steps = new List(Types::String);
+
+        steps.addEnd('Second');
+        steps.addEnd('Third');
+
+        // addStart pushes a value in at the FRONT
+        steps.addStart('First');
+
+        // Unlike a Map, a List keeps exactly the order you built it in
+        ListEnumerator enumerator = steps.getEnumerator();
+        str            inOrder    = '';
+
+        while (enumerator.moveNext())
+        {
+            inOrder += enumerator.current() + ' ';
+        }
+
+        // inOrder = 'First Second Third '
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>part03_duplicatesAllowed</Name>
+				<Source><![CDATA[
+    /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+    // Part 3 - Duplicates are allowed
+    private static void part03_duplicatesAllowed()
+    {
+        List items = new List(Types::String);
+
+        items.addEnd('Widget');
+        items.addEnd('Gadget');
+
+        // A Map would replace the value. A List just adds another one.
+        items.addEnd('Widget');
+
+        int itemCount = items.elements();                   // 3, not 2
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>part04_enumerator</Name>
+				<Source><![CDATA[
+    /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+    // Part 4 - Walking a List with a ListEnumerator
+    private static void part04_enumerator()
+    {
+        List quantities = new List(Types::Integer);
+
+        quantities.addEnd(5);
+        quantities.addEnd(2);
+        quantities.addEnd(9);
+
+        ListEnumerator enumerator = quantities.getEnumerator();
+        int            currentQty;
+        int            totalQty   = 0;
+
+        // moveNext steps onto the next value,
+        // and returns false once the list is finished
+        while (enumerator.moveNext())
+        {
+            currentQty = enumerator.current();          // 5, 2, 9
+            totalQty  += currentQty;
+        }
+
+        // totalQty = 16
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>part05_iterator</Name>
+				<Source><![CDATA[
+    /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+    // Part 5 - ListIterator: the older way of walking a List
+    private static void part05_iterator()
+    {
+        List quantities = new List(Types::Integer);
+
+        quantities.addEnd(5);
+        quantities.addEnd(2);
+        quantities.addEnd(9);
+
+        ListIterator iterator   = new ListIterator(quantities);
+        int          highestQty = 0;
+
+        // more() says there is still a value to look at,
+        // next() moves on. Forget next() and you loop forever.
+        while (iterator.more())
+        {
+            if (iterator.value() > highestQty)
+            {
+                highestQty = iterator.value();
+            }
+
+            iterator.next();
+        }
+
+        // highestQty = 9
+        // You will meet ListIterator in older code.
+        // For new code the enumerator in part 4 reads better.
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>part06_noLookup</Name>
+				<Source><![CDATA[
+    /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+    // Part 6 - No lookup, no exists, no index
+    private static void part06_noLookup()
+    {
+        List fruit = new List(Types::String);
+
+        fruit.addEnd('Apple');
+        fruit.addEnd('Banana');
+        fruit.addEnd('Cherry');
+
+        // There is no fruit.lookup(2) and no fruit.exists('Cherry').
+        // To find something, you walk the list yourself.
+        ListEnumerator enumerator  = fruit.getEnumerator();
+        str            current;
+        int            position    = 0;
+        str            secondFruit = '';
+        boolean        hasCherry   = false;
+
+        while (enumerator.moveNext())
+        {
+            position++;
+            current = enumerator.current();
+
+            if (position == 2)
+            {
+                secondFruit = current;                  // 'Banana'
+            }
+
+            if (current == 'Cherry')
+            {
+                hasCherry = true;
+            }
+        }
+
+        // secondFruit = 'Banana', hasCherry = true
+        // If you search by value a lot, a Set or a Map is the better tool.
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>part07_removeByFiltering</Name>
+				<Source><![CDATA[
+    /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+    // Part 7 - Removing values: build a new list
+    private static void part07_removeByFiltering()
+    {
+        List quantities = new List(Types::Integer);
+
+        quantities.addEnd(5);
+        quantities.addEnd(0);
+        quantities.addEnd(9);
+        quantities.addEnd(0);
+
+        int countBefore = quantities.elements();            // 4
+
+        // A List has no remove method.
+        // Walk it, and copy only the values you want to keep into a new list.
+        List           keptQuantities = new List(Types::Integer);
+        ListEnumerator enumerator     = quantities.getEnumerator();
+        int            currentQty;
+
+        while (enumerator.moveNext())
+        {
+            currentQty = enumerator.current();
+
+            if (currentQty != 0)
+            {
+                keptQuantities.addEnd(currentQty);
+            }
+        }
+
+        quantities = keptQuantities;
+
+        int countAfter = quantities.elements();             // 2
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>part08_appendAndMerge</Name>
+				<Source><![CDATA[
+    /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+    // Part 8 - Joining lists: appendList and List::merge
+    private static void part08_appendAndMerge()
+    {
+        List morning = new List(Types::String);
+        morning.addEnd('Widget');
+        morning.addEnd('Gadget');
+
+        List afternoon = new List(Types::String);
+        afternoon.addEnd('Gizmo');
+
+        // List::merge builds a NEW list - both originals stay as they were
+        List wholeDay = List::merge(morning, afternoon);
+
+        int wholeDayCount = wholeDay.elements();            // 3
+        int morningCount  = morning.elements();             // still 2
+
+        // appendList changes the list you call it on
+        morning.appendList(afternoon);
+
+        int morningAfterAppend = morning.elements();        // 3
+
+        // Both lists must hold the same type, or you get an error
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>part09_listOfContainers</Name>
+				<Source><![CDATA[
+    /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+    // Part 9 - A List of containers: rows in memory
+    private static void part09_listOfContainers()
+    {
+        // Each value is a container: item, quantity, price
+        List salesLines = new List(Types::Container);
+
+        salesLines.addEnd(['Widget', 5, 19.99]);
+        salesLines.addEnd(['Gadget', 2, 34.50]);
+        salesLines.addEnd(['Widget', 3, 19.99]);
+
+        ListEnumerator enumerator = salesLines.getEnumerator();
+        container      line;
+        str            itemId;
+        int            qty;
+        real           price;
+        real           orderTotal = 0;
+
+        while (enumerator.moveNext())
+        {
+            line = enumerator.current();
+            [itemId, qty, price] = line;
+
+            orderTotal += qty * price;
+        }
+
+        // orderTotal = 99.95 + 69.00 + 59.97 = 228.92
+        // The rows come back in exactly the order they were added
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>part10_strSplit</Name>
+				<Source><![CDATA[
+    /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+    // Part 10 - strSplit hands you a List
+    private static void part10_strSplit()
+    {
+        // You have probably used a List already without noticing:
+        // strSplit returns one.
+        str  fileLine = 'Widget;Gadget;Gizmo';
+        List values   = strSplit(fileLine, ';');
+
+        int valueCount = values.elements();                 // 3
+
+        ListEnumerator enumerator = values.getEnumerator();
+        enumerator.moveNext();
+        str firstValue = enumerator.current();              // 'Widget'
+
+        // Careful: the second parameter is a SET of characters,
+        // and every one of them is treated as a separator
+        List mixedValues = strSplit('A,B;C', ',;');
+
+        int mixedCount = mixedValues.elements();            // 3
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>part11_packAndCreate</Name>
+				<Source><![CDATA[
+    /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+    // Part 11 - pack and List::create: sending a List somewhere else
+    private static void part11_packAndCreate()
+    {
+        List items = new List(Types::String);
+
+        items.addEnd('Widget');
+        items.addEnd('Gadget');
+
+        // pack turns the whole list into a container
+        container packedList = items.pack();
+
+        // List::create builds a brand new list back out of that container.
+        // This is how a list rides along to a batch job or into SysLastValue.
+        List rebuiltList = List::create(packedList);
+
+        int rebuiltCount = rebuiltList.elements();          // 2
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>part12_referenceNotCopy</Name>
+				<Source><![CDATA[
+    /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+    // Part 12 - A List is a reference, not a copy
+    private static void part12_referenceNotCopy()
+    {
+        List items = new List(Types::String);
+        items.addEnd('Widget');
+
+        int countBeforeCall = items.elements();             // 1
+
+        // Pass the list into a method...
+        MyListTutorial::addGizmo(items);
+
+        // ...and the method changed OUR list
+        int countAfterCall = items.elements();              // 2
+
+        // When you really do want a separate copy: pack it, then rebuild it
+        List trueCopy = List::create(items.pack());
+        trueCopy.addEnd('Sprocket');
+
+        int copyCount      = trueCopy.elements();           // 3
+        int untouchedCount = items.elements();              // still 2
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>addGizmo</Name>
+				<Source><![CDATA[
+    /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+    // Helper for part 12 - adds a value to whatever list it is given
+    private static void addGizmo(List _items)
+    {
+        _items.addEnd('Gizmo');
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>
