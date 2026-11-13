@@ -1,0 +1,636 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>MyContainerTutorial</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+// The F&O Show - Containers in X++
+class MyContainerTutorial
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>main</Name>
+				<Source><![CDATA[
+    public static void main(Args _args)
+    {
+        MyContainerTutorial::part01_createContainers();
+        MyContainerTutorial::part02_lengthAndPeek();
+        MyContainerTutorial::part03_poke();
+        MyContainerTutorial::part04_insert();
+        MyContainerTutorial::part05_delete();
+        MyContainerTutorial::part06_find();
+        MyContainerTutorial::part07_appendAndCopy();
+        MyContainerTutorial::part08_unpackAndNested();
+        MyContainerTutorial::part09_stringConversion();
+        MyContainerTutorial::part10_looping();
+        MyContainerTutorial::part11_packAndUnpack();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>part01_createContainers</Name>
+				<Source><![CDATA[
+    /*
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+    // Part 1 - Creating containers
+    private static void part01_createContainers()
+    {
+        // An empty container
+        container emptyContainer = conNull();
+        int       emptyLength    = conLen(emptyContainer);    // 0
+
+        // Square brackets create a container with values
+        container fruits = ['Apple', 'Banana', 'Cherry'];
+
+        // One container can hold different types
+        container mixed    = ['Widget', 42, 19.99, true];
+        str       itemName = conPeek(mixed, 1);    // 'Widget'
+        int       quantity = conPeek(mixed, 2);    // 42
+        real      price    = conPeek(mixed, 3);    // 19.99
+        boolean   inStock  = conPeek(mixed, 4);    // true
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>part02_lengthAndPeek</Name>
+				<Source><![CDATA[
+    /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+    // Part 2 - conLen and conPeek
+    private static void part02_lengthAndPeek()
+    {
+        container fruits     = ['Apple', 'Banana', 'Cherry'];
+        int       fruitCount = conLen(fruits);       // 3
+
+        // Positions start at 1, not 0
+        str firstFruit  = conPeek(fruits, 1);        // 'Apple'
+        str secondFruit = conPeek(fruits, 2);        // 'Banana'
+
+        // Peeking outside the container can cause errors, so check the position first
+        int position  = 5;
+        str safeValue = '';
+
+        if (position >= 1 && position <= fruitCount)
+        {
+            safeValue = conPeek(fruits, position);
+        }
+        // safeValue stays '' because there is no position 5
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>part03_poke</Name>
+				<Source><![CDATA[
+    /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+    // Part 3 - conPoke: replace elements
+    private static void part03_poke()
+    {
+        container fruits = ['Apple', 'Banana', 'Cherry'];
+
+        // conPoke returns a NEW container - the original does not change
+        container withBlueberry = conPoke(fruits, 2, 'Blueberry');
+
+        // fruits        = ['Apple', 'Banana', 'Cherry']
+        // withBlueberry = ['Apple', 'Blueberry', 'Cherry']
+
+
+
+        // Replace more than one element at once
+        container twoReplaced = conPoke(fruits, 1, 'Avocado', 'Blackberry');
+
+        // twoReplaced = ['Avocado', 'Blackberry', 'Cherry']
+
+
+        // In real code, assign the result back to the same variable
+        fruits = conPoke(fruits, 3, 'Coconut');
+
+        // fruits = ['Apple', 'Banana', 'Coconut']
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>part04_insert</Name>
+				<Source><![CDATA[
+    /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+    // Part 4 - conIns: insert elements
+    private static void part04_insert()
+    {
+        container fruits = ['Apple', 'Banana', 'Cherry'];
+
+        // Insert at the front: position 1
+        container atFront = conIns(fruits, 1, 'Mango');
+
+        // ['Mango', 'Apple', 'Banana', 'Cherry']
+
+
+
+        // Insert at the end: length + 1
+        container atEnd = conIns(atFront, conLen(atFront) + 1, 'Grape');
+
+        // ['Mango', 'Apple', 'Banana', 'Cherry', 'Grape']
+
+
+
+        // Insert several values in one call
+        container twoInserted = conIns(atEnd, 3, 'Kiwi', 'Lemon');
+
+        // ['Mango', 'Apple', 'Kiwi', 'Lemon', 'Banana', 'Cherry', 'Grape']
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>part05_delete</Name>
+				<Source><![CDATA[
+    /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+    // Part 5 - conDel: remove elements
+    private static void part05_delete()
+    {
+        container fruits = ['Mango', 'Apple', 'Kiwi', 'Lemon', 'Banana', 'Cherry', 'Grape'];
+
+        // conDel(container, start position, how many to remove)
+        container withoutMango = conDel(fruits, 1, 1);
+
+        // ['Apple', 'Kiwi', 'Lemon', 'Banana', 'Cherry', 'Grape']
+
+
+
+        container withoutKiwiAndLemon = conDel(withoutMango, 2, 2);
+
+        // ['Apple', 'Banana', 'Cherry', 'Grape']
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>part06_find</Name>
+				<Source><![CDATA[
+    /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+    // Part 6 - conFind: search for a value
+    private static void part06_find()
+    {
+        container fruits = ['Apple', 'Banana', 'Cherry', 'Banana'];
+
+        int bananaPosition = conFind(fruits, 'Banana');    // 2 - first match only
+        int durianPosition = conFind(fruits, 'Durian');    // 0 - not found
+
+
+        // 0 means false, so conFind works directly in an if statement
+        boolean hasCherry = false;
+
+
+        if (conFind(fruits, 'Cherry'))
+        {
+            hasCherry = true;
+        }
+        // hasCherry = true
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>part07_appendAndCopy</Name>
+				<Source><![CDATA[
+    /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+    // Part 7 - Appending with += and copying containers
+    private static void part07_appendAndCopy()
+    {
+        container firstHalf  = ['Apple', 'Banana'];
+        container secondHalf = ['Cherry', 'Date'];
+
+        // += adds one container to the end of another
+        container allFruits = firstHalf;
+        allFruits += secondHalf;
+
+        // ['Apple', 'Banana', 'Cherry', 'Date']
+
+
+
+        // += also adds a single value
+        allFruits += 'Elderberry';
+
+        // ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry']
+
+
+         
+        // Containers are values, not references:
+        // changing the copy does not change the original
+        container copyOfFirstHalf = firstHalf;
+        copyOfFirstHalf = conPoke(copyOfFirstHalf, 1, 'CHANGED');
+
+        // firstHalf       = ['Apple', 'Banana']
+        // copyOfFirstHalf = ['CHANGED', 'Banana']
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>part08_unpackAndNested</Name>
+				<Source><![CDATA[
+    /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+    // Part 8 - Unpacking into variables, and containers inside containers
+    private static void part08_unpackAndNested()
+    {
+        container orderLine = ['Widget', 5, 19.99];
+        str       itemName;
+        int       quantity;
+        real      price;
+
+        // Unpack every element into its own variable in one line
+        [itemName, quantity, price] = orderLine;
+
+        // itemName = 'Widget', quantity = 5, price = 19.99
+
+
+
+        // A container can hold other containers - like rows in a table
+        container rows     = [['Widget', 5], ['Gadget', 2], ['Gizmo', 9]];
+        int       rowCount = conLen(rows);     // 3
+        container row;
+        str       rowItem;
+        int       rowQty;
+        int       totalQty = 0;
+        int       i;
+
+
+        for (i = 1; i <= rowCount; i++)
+        {
+            row = conPeek(rows, i);     // ['Widget', 5], then ['Gadget', 2], then ['Gizmo', 9]
+            [rowItem, rowQty] = row;
+            totalQty += rowQty;
+        }
+
+        // totalQty = 16
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>part09_stringConversion</Name>
+				<Source><![CDATA[
+    /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+    // Part 9 - str2con and con2Str
+    private static void part09_stringConversion()
+    {
+        // str2con: text to container, split on a separator
+        container colors = str2con('red,green,blue', ',');
+        // ['red', 'green', 'blue']
+
+        // con2Str: container to text, joined with any separator
+        str colorText = con2Str(colors, ' / ');
+        // 'red / green / blue'
+
+        // Third parameter true converts the pieces to integers
+        container numbers = str2con('10,20,30', ',', true);
+        int       total   = conPeek(numbers, 1) + conPeek(numbers, 2);    // 30
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>part10_looping</Name>
+				<Source><![CDATA[
+    /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+    // Part 10 - Looping through a container
+    private static void part10_looping()
+    {
+        container fruits = ['Apple', 'Banana', 'Cherry'];
+        str       currentFruit;
+        int       i;
+
+        // Loop forward: from 1 to conLen, reading each element with conPeek
+        for (i = 1; i <= conLen(fruits); i++)
+        {
+            currentFruit = conPeek(fruits, i);    // 'Apple', then 'Banana', then 'Cherry'
+        }
+
+
+        // Loop BACKWARD when you remove elements while looping,
+        // so deleting does not shift the positions you still have to visit
+        container basket = ['Apple', 'Banana', 'Cherry', 'Banana'];
+
+
+        for (i = conLen(basket); i >= 1; i--)
+        {
+            if (conPeek(basket, i) == 'Banana')
+            {
+                basket = conDel(basket, i, 1);
+            }
+        }
+
+        // basket = ['Apple', 'Cherry']
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>part11_packAndUnpack</Name>
+				<Source><![CDATA[
+    /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+    // Part 11 - Pack and unpack: how Dynamics stores state in containers
+    private static void part11_packAndUnpack()
+    {
+        // A List can be packed into a container and rebuilt from it
+        List fruitList = new List(Types::String);
+        fruitList.addEnd('Apple');
+        fruitList.addEnd('Banana');
+
+
+        container packedList   = fruitList.pack();
+        List      restoredList = List::create(packedList);
+        int       listCount    = restoredList.elements();    // 2
+
+
+        // The same works for a Map
+        Map numberNames = new Map(Types::Integer, Types::String);
+        numberNames.insert(1, 'One');
+        numberNames.insert(2, 'Two');
+
+
+        container packedMap   = numberNames.pack();
+        Map       restoredMap = Map::create(packedMap);
+        str       nameOfTwo   = restoredMap.lookup(2);       // 'Two'
+
+
+        // Our own class: pack() saves its state, unpack() restores it
+        MyContainerPackable item       = MyContainerPackable::construct('Widget', 5);
+        container           packedItem = item.pack();
+
+        // [1, 'Widget', 5] - version number first, then the fields
+
+
+        MyContainerPackable restoredItem = new MyContainerPackable();
+        boolean             isRestored   = restoredItem.unpack(packedItem);    // true
+        str                 restoredName = restoredItem.parmItemName();       // 'Widget'
+        int                 restoredQty  = restoredItem.parmQty();            // 5
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>
