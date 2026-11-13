@@ -1,0 +1,712 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>MyMapTutorial</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+// The F&O Show - Maps in X++
+class MyMapTutorial
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>main</Name>
+				<Source><![CDATA[
+    public static void main(Args _args)
+    {
+        MyMapTutorial::part01_createMaps();
+        MyMapTutorial::part02_lookupAndExists();
+        MyMapTutorial::part03_insertReplaces();
+        MyMapTutorial::part04_remove();
+        MyMapTutorial::part05_enumerator();
+        MyMapTutorial::part06_iterator();
+        MyMapTutorial::part07_removeSafely();
+        MyMapTutorial::part08_keyAndValueTypes();
+        MyMapTutorial::part09_objectsAsValues();
+        MyMapTutorial::part10_runningTotals();
+        MyMapTutorial::part11_packAndUnpack();
+        MyMapTutorial::part12_referenceNotCopy();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>part01_createMaps</Name>
+				<Source><![CDATA[
+    /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+    // Part 1 - Creating a Map
+    private static void part01_createMaps()
+    {
+        // A Map stores key / value pairs.
+        // You fix the type of the key and the type of the value up front.
+        Map numberNames = new Map(Types::Integer, Types::String);
+
+        boolean isEmptyAtStart = numberNames.empty();       // true
+        int     countAtStart   = numberNames.elements();    // 0
+
+        // insert adds one pair at a time
+        numberNames.insert(1, 'One');
+        numberNames.insert(2, 'Two');
+        numberNames.insert(3, 'Three');
+
+        int     countAfterInsert = numberNames.elements();  // 3
+        boolean isEmptyNow       = numberNames.empty();     // false
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>part02_lookupAndExists</Name>
+				<Source><![CDATA[
+    /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+    // Part 2 - lookup and exists
+    private static void part02_lookupAndExists()
+    {
+        Map numberNames = new Map(Types::Integer, Types::String);
+
+        numberNames.insert(1, 'One');
+        numberNames.insert(2, 'Two');
+
+        // lookup gives you the value stored against a key
+        str nameOfOne = numberNames.lookup(1);          // 'One'
+
+        // exists just asks the question - it never throws
+        boolean hasTwo  = numberNames.exists(2);        // true
+        boolean hasNine = numberNames.exists(9);        // false
+
+        // lookup on a key that is NOT there throws an error.
+        // So check with exists first and keep a default ready.
+        str nameOfNine = '';
+
+        if (numberNames.exists(9))
+        {
+            nameOfNine = numberNames.lookup(9);
+        }
+        // nameOfNine stays '' because there is no key 9
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>part03_insertReplaces</Name>
+				<Source><![CDATA[
+    /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+    // Part 3 - Inserting the same key again replaces the value
+    private static void part03_insertReplaces()
+    {
+        Map stock = new Map(Types::String, Types::Integer);
+
+        stock.insert('Widget', 5);
+
+        int firstValue      = stock.lookup('Widget');   // 5
+        int countAfterFirst = stock.elements();         // 1
+
+        // Same key again - the value is overwritten,
+        // you do NOT get a second entry
+        stock.insert('Widget', 12);
+
+        int secondValue      = stock.lookup('Widget');  // 12
+        int countAfterSecond = stock.elements();        // still 1
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>part04_remove</Name>
+				<Source><![CDATA[
+    /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+    // Part 4 - Removing pairs
+    private static void part04_remove()
+    {
+        Map stock = new Map(Types::String, Types::Integer);
+
+        stock.insert('Widget', 5);
+        stock.insert('Gadget', 2);
+        stock.insert('Gizmo', 9);
+
+        int countBefore = stock.elements();             // 3
+
+        stock.remove('Gadget');
+
+        int     countAfter = stock.elements();          // 2
+        boolean gadgetGone = stock.exists('Gadget');    // false
+
+        // Removing a key that was never there is safe - nothing happens
+        stock.remove('Sprocket');
+
+        int countUnchanged = stock.elements();          // still 2
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>part05_enumerator</Name>
+				<Source><![CDATA[
+    /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+    // Part 5 - Walking a Map with a MapEnumerator
+    private static void part05_enumerator()
+    {
+        Map stock = new Map(Types::String, Types::Integer);
+
+        stock.insert('Widget', 5);
+        stock.insert('Gadget', 2);
+        stock.insert('Gizmo', 9);
+
+        MapEnumerator enumerator = stock.getEnumerator();
+        str           currentItem;
+        int           currentQty;
+        int           totalQty = 0;
+
+        // moveNext steps onto the next pair,
+        // and returns false once the map is finished
+        while (enumerator.moveNext())
+        {
+            currentItem = enumerator.currentKey();      // 'Widget', 'Gadget', 'Gizmo'
+            currentQty  = enumerator.currentValue();    // 5, 2, 9
+            totalQty   += currentQty;
+        }
+
+        // totalQty = 16
+        // Never rely on the pairs coming back in the order you inserted them
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>part06_iterator</Name>
+				<Source><![CDATA[
+    /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+    // Part 6 - MapIterator: the older way of walking a Map
+    private static void part06_iterator()
+    {
+        Map stock = new Map(Types::String, Types::Integer);
+
+        stock.insert('Widget', 5);
+        stock.insert('Gadget', 2);
+        stock.insert('Gizmo', 9);
+
+        MapIterator iterator = new MapIterator(stock);
+        str         visited  = '';
+        int         highestQty = 0;
+
+        // more() says there is still a pair to look at,
+        // next() moves on. Forget next() and you loop forever.
+        while (iterator.more())
+        {
+            visited += iterator.key() + ' ';
+
+            if (iterator.value() > highestQty)
+            {
+                highestQty = iterator.value();
+            }
+
+            iterator.next();
+        }
+
+        // highestQty = 9
+        // You will meet MapIterator in older code.
+        // For new code the enumerator in part 5 reads better.
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>part07_removeSafely</Name>
+				<Source><![CDATA[
+    /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+    // Part 7 - Removing entries while you walk the map
+    private static void part07_removeSafely()
+    {
+        Map stock = new Map(Types::String, Types::Integer);
+
+        stock.insert('Widget', 5);
+        stock.insert('Gadget', 0);
+        stock.insert('Gizmo', 9);
+        stock.insert('Sprocket', 0);
+
+        // Changing a map while you are walking it is asking for trouble.
+        // Collect the keys in one pass, remove them in a second pass.
+        MapEnumerator enumerator   = stock.getEnumerator();
+        container     keysToRemove = conNull();
+        str           currentItem;
+        int           i;
+
+        while (enumerator.moveNext())
+        {
+            if (enumerator.currentValue() == 0)
+            {
+                currentItem   = enumerator.currentKey();
+                keysToRemove += currentItem;
+            }
+        }
+
+        // keysToRemove = ['Gadget', 'Sprocket']
+
+        for (i = 1; i <= conLen(keysToRemove); i++)
+        {
+            stock.remove(conPeek(keysToRemove, i));
+        }
+
+        int countAfter = stock.elements();              // 2
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>part08_keyAndValueTypes</Name>
+				<Source><![CDATA[
+    /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+    // Part 8 - Keys and values do not have to be int and str
+    private static void part08_keyAndValueTypes()
+    {
+        // String key, real value
+        Map pricesByItem = new Map(Types::String, Types::Real);
+
+        pricesByItem.insert('Widget', 19.99);
+        pricesByItem.insert('Gadget', 34.50);
+
+        real widgetPrice = pricesByItem.lookup('Widget');   // 19.99
+
+        // Int64 key - this is the one you want when the key is a RecId
+        Map namesByRecId = new Map(Types::Int64, Types::String);
+
+        namesByRecId.insert(5637144576, 'Contoso');
+
+        str contosoName = namesByRecId.lookup(5637144576);  // 'Contoso'
+
+        // A date key works just as well
+        Map notesByDate = new Map(Types::Date, Types::String);
+
+        notesByDate.insert(31\10\2026, 'Month end');
+
+        str monthEndNote = notesByDate.lookup(31\10\2026);  // 'Month end'
+
+        // And a container can be the VALUE, so one key can carry several fields
+        Map lineByItem = new Map(Types::String, Types::Container);
+
+        lineByItem.insert('Widget', ['Widget', 5, 19.99]);
+
+        container widgetLine = lineByItem.lookup('Widget');
+        str       lineItem;
+        int       lineQty;
+        real      linePrice;
+
+        [lineItem, lineQty, linePrice] = widgetLine;        // 'Widget', 5, 19.99
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>part09_objectsAsValues</Name>
+				<Source><![CDATA[
+    /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+    // Part 9 - Storing whole objects as values
+    private static void part09_objectsAsValues()
+    {
+        // Types::Class lets the map hold objects
+        Map productsByItemId = new Map(Types::String, Types::Class);
+
+        productsByItemId.insert('D0001', MyMapProduct::construct('D0001', 'Widget', 19.99));
+        productsByItemId.insert('D0002', MyMapProduct::construct('D0002', 'Gadget', 34.50));
+
+        MyMapProduct product      = productsByItemId.lookup('D0002');
+        str          productName  = product.parmName();     // 'Gadget'
+        real         productPrice = product.parmPrice();    // 34.50
+
+        // The map holds a REFERENCE to the object, not a copy of it.
+        // Change the object and the map shows the change too.
+        product.parmPrice(39.95);
+
+        MyMapProduct sameProduct = productsByItemId.lookup('D0002');
+        real         newPrice    = sameProduct.parmPrice(); // 39.95
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>part10_runningTotals</Name>
+				<Source><![CDATA[
+    /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+    // Part 10 - Running totals: the pattern you will actually use
+    private static void part10_runningTotals()
+    {
+        // Pretend these are sales lines: item, quantity
+        container lines     = [['Widget', 5], ['Gadget', 2], ['Widget', 3], ['Gizmo', 9], ['Gadget', 1]];
+        Map       qtyByItem = new Map(Types::String, Types::Integer);
+        container line;
+        str       itemId;
+        int       qty;
+        int       runningQty;
+        int       i;
+
+        for (i = 1; i <= conLen(lines); i++)
+        {
+            line = conPeek(lines, i);
+            [itemId, qty] = line;
+
+            // Already in the map? Carry on from that total. If not, start at 0.
+            runningQty = qtyByItem.exists(itemId) ? qtyByItem.lookup(itemId) : 0;
+
+            qtyByItem.insert(itemId, runningQty + qty);
+        }
+
+        int widgetTotal   = qtyByItem.lookup('Widget');     // 8
+        int gadgetTotal   = qtyByItem.lookup('Gadget');     // 3
+        int gizmoTotal    = qtyByItem.lookup('Gizmo');      // 9
+        int distinctItems = qtyByItem.elements();           // 3
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>part11_packAndUnpack</Name>
+				<Source><![CDATA[
+    /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+    // Part 11 - pack and unpack: sending a Map somewhere else
+    private static void part11_packAndUnpack()
+    {
+        Map qtyByItem = new Map(Types::String, Types::Integer);
+
+        qtyByItem.insert('Widget', 8);
+        qtyByItem.insert('Gadget', 3);
+
+        // pack turns the whole map into a container
+        container packedMap = qtyByItem.pack();
+
+        // Map::create builds a brand new map back out of that container.
+        // This is how a map rides along to a batch job or into SysLastValue.
+        Map rebuiltMap = Map::create(packedMap);
+
+        int rebuiltCount  = rebuiltMap.elements();          // 2
+        int rebuiltWidget = rebuiltMap.lookup('Widget');    // 8
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>part12_referenceNotCopy</Name>
+				<Source><![CDATA[
+    /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+    // Part 12 - A Map is a reference, a container is a copy
+    private static void part12_referenceNotCopy()
+    {
+        // From the containers video: assigning a container copies it
+        container originalContainer = ['Apple', 'Banana'];
+        container copiedContainer   = originalContainer;
+
+        copiedContainer = conPoke(copiedContainer, 1, 'CHANGED');
+
+        // originalContainer = ['Apple', 'Banana']   - untouched
+
+
+        // A Map does the opposite
+        Map originalMap = new Map(Types::String, Types::Integer);
+        originalMap.insert('Widget', 5);
+
+        Map secondName = originalMap;       // NOT a copy - the same map, two names
+        secondName.insert('Gadget', 2);
+
+        int originalCount = originalMap.elements();         // 2, not 1
+
+
+        // When you really do want a separate copy: pack it, then rebuild it
+        Map trueCopy = Map::create(originalMap.pack());
+        trueCopy.insert('Gizmo', 9);
+
+        int copyCount      = trueCopy.elements();           // 3
+        int untouchedCount = originalMap.elements();        // 2
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>
