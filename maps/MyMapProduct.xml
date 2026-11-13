@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>MyMapProduct</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+// The F&O Show - Maps in X++
+// A small class used as a VALUE inside a Map in part 9.
+class MyMapProduct
+{
+    str  itemId;
+    str  name;
+    real price;
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>construct</Name>
+				<Source><![CDATA[
+    public static MyMapProduct construct(str _itemId, str _name, real _price)
+    {
+        MyMapProduct product = new MyMapProduct();
+
+        product.parmItemId(_itemId);
+        product.parmName(_name);
+        product.parmPrice(_price);
+
+        return product;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>parmItemId</Name>
+				<Source><![CDATA[
+    public str parmItemId(str _itemId = itemId)
+    {
+        itemId = _itemId;
+
+        return itemId;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>parmName</Name>
+				<Source><![CDATA[
+    public str parmName(str _name = name)
+    {
+        name = _name;
+
+        return name;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>parmPrice</Name>
+				<Source><![CDATA[
+    public real parmPrice(real _price = price)
+    {
+        price = _price;
+
+        return price;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>
