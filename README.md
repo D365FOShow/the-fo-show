@@ -25,5 +25,3 @@ All classes start with the prefix `My`. Rename them if they clash with classes y
 ## License
 
 [MIT](LICENSE)
-# the F & O show
-X++ source code for The F & O Show YouTube tutorials (Dynamics 365 Finance &amp; Operations)
