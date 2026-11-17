@@ -9,6 +9,7 @@ Source code for the X++ tutorials on [The F&O Show](https://www.youtube.com/@D36
 | [X++ Containers Explained: Every Method & Gotcha](https://youtu.be/zvzE4mVBG_Q) | [containers/](containers) |
 | [X++ Maps Explained: Every Method & Gotcha](https://youtu.be/rlEL7aHoEk0) | [maps/](maps) |
 | [X++ Lists Explained: Every Method & Gotcha](https://youtu.be/a76Z_fUjB_s) | [lists/](lists) |
+| [X++ Sets Explained: Every Method & Gotcha](https://youtu.be/6k9RlI9cP6A) | [sets/](sets) |
 
 ## Using the code
 
