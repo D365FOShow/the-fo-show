@@ -1,0 +1,419 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>MySetTutorial</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+// The F&O Show - Sets in X++
+class MySetTutorial
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>main</Name>
+				<Source><![CDATA[
+    public static void main(Args _args)
+    {
+        MySetTutorial::part01_createSet();
+        MySetTutorial::part02_duplicatesIgnored();
+        MySetTutorial::part03_sortedOrder();
+        MySetTutorial::part04_inAndRemove();
+        MySetTutorial::part05_processOnce();
+        MySetTutorial::part06_compareSets();
+        MySetTutorial::part07_referenceNotCopy();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>part01_createSet</Name>
+				<Source><![CDATA[
+    /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+    // Part 1 - Creating a Set
+    private static void part01_createSet()
+    {
+        // A Set holds values of ONE type, and you fix that type up front
+        Set fruit = new Set(Types::String);
+
+        boolean isEmptyAtStart = fruit.empty();             // true
+        int     countAtStart   = fruit.elements();          // 0
+
+        // add puts a value into the set
+        fruit.add('Apple');
+        fruit.add('Banana');
+        fruit.add('Cherry');
+
+        int     countAfterAdd = fruit.elements();           // 3
+        boolean isEmptyNow    = fruit.empty();              // false
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>part02_duplicatesIgnored</Name>
+				<Source><![CDATA[
+    /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+    // Part 2 - Duplicates are ignored, and add tells you so
+    private static void part02_duplicatesIgnored()
+    {
+        Set items = new Set(Types::String);
+
+        // add returns true when the value goes in,
+        // and false when it was already there
+        boolean widgetAdded      = items.add('Widget');     // true
+        boolean gadgetAdded      = items.add('Gadget');     // true
+        boolean widgetAddedAgain = items.add('Widget');     // false
+
+        int itemCount = items.elements();                   // 2, not 3
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>part03_sortedOrder</Name>
+				<Source><![CDATA[
+    /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+    // Part 3 - A Set keeps its values sorted
+    private static void part03_sortedOrder()
+    {
+        Set items = new Set(Types::String);
+
+        items.add('Widget');
+        items.add('Gadget');
+        items.add('Gizmo');
+
+        SetEnumerator enumerator = items.getEnumerator();
+        str           currentItem;
+        str           itemsInOrder;
+
+        while (enumerator.moveNext())
+        {
+            currentItem = enumerator.current();             // Gadget, Gizmo, Widget
+
+            if (itemsInOrder)
+            {
+                itemsInOrder += ', ';
+            }
+            itemsInOrder += currentItem;
+        }
+
+        // itemsInOrder = 'Gadget, Gizmo, Widget'
+
+        // Numbers are sorted by value, not as text
+        Set quantities = new Set(Types::Integer);
+
+        quantities.add(100);
+        quantities.add(5);
+        quantities.add(20);
+
+        int       currentQuantity;
+        container quantitiesInOrder;
+
+        enumerator = quantities.getEnumerator();
+        while (enumerator.moveNext())
+        {
+            currentQuantity    = enumerator.current();      // 5, 20, 100
+            quantitiesInOrder += [currentQuantity];
+        }
+
+        // quantitiesInOrder = [5, 20, 100]
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>part04_inAndRemove</Name>
+				<Source><![CDATA[
+    /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+    // Part 4 - in and remove: the two things a List can't do
+    private static void part04_inAndRemove()
+    {
+        Set items = new Set(Types::String);
+
+        items.add('Widget');
+        items.add('Gadget');
+        items.add('Gizmo');
+
+        int countBefore = items.elements();                 // 3
+
+        // in asks whether a value is in the set
+        boolean hasGadget   = items.in('Gadget');           // true
+        boolean hasSprocket = items.in('Sprocket');         // false
+
+        // remove returns true if the value was there,
+        // and false if it wasn't - no error either way
+        boolean gadgetRemoved   = items.remove('Gadget');   // true
+        boolean sprocketRemoved = items.remove('Sprocket'); // false
+
+        int countAfter = items.elements();                  // 2
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>part05_processOnce</Name>
+				<Source><![CDATA[
+    /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+    // Part 5 - Do the work once per item, not once per line
+    private static void part05_processOnce()
+    {
+        container lines = ['Widget', 'Gadget', 'Widget', 'Gizmo', 'Gadget'];
+
+        Set processed      = new Set(Types::String);
+        str itemId;
+        int processedCount = 0;
+        int skippedCount   = 0;
+        int i;
+
+        for (i = 1; i <= conLen(lines); i++)
+        {
+            itemId = conPeek(lines, i);
+
+            if (processed.in(itemId))
+            {
+                // Already handled this item, so skip it
+                skippedCount++;
+            }
+            else
+            {
+                processed.add(itemId);
+
+                // Do the expensive work here, once per item
+                processedCount++;
+            }
+        }
+
+        // processedCount = 3, skippedCount = 2
+        // processed      = Gadget, Gizmo, Widget
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>part06_compareSets</Name>
+				<Source><![CDATA[
+    /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+    // Part 6 - Comparing two sets: union, intersection and difference
+    private static void part06_compareSets()
+    {
+        Set warehouseA = new Set(Types::String);
+        warehouseA.add('Widget');
+        warehouseA.add('Gadget');
+        warehouseA.add('Gizmo');
+
+        Set warehouseB = new Set(Types::String);
+        warehouseB.add('Gizmo');
+        warehouseB.add('Sprocket');
+
+        // Each one builds a brand new set
+        Set inEither = Set::union(warehouseA, warehouseB);          // Gadget, Gizmo, Sprocket, Widget
+        Set inBoth   = Set::intersection(warehouseA, warehouseB);   // Gizmo
+        Set onlyInA  = Set::difference(warehouseA, warehouseB);     // Gadget, Widget
+        Set onlyInB  = Set::difference(warehouseB, warehouseA);     // Sprocket
+
+        int eitherCount     = inEither.elements();          // 4
+        int bothCount       = inBoth.elements();            // 1
+        int onlyInACount    = onlyInA.elements();           // 2
+        int onlyInBCount    = onlyInB.elements();           // 1
+        int warehouseACount = warehouseA.elements();        // still 3
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>part07_referenceNotCopy</Name>
+				<Source><![CDATA[
+    /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+    // Part 7 - A Set is a reference, not a copy
+    private static void part07_referenceNotCopy()
+    {
+        Set original = new Set(Types::String);
+        original.add('Widget');
+
+        // A second name for the same set, not a copy
+        Set secondName = original;
+        secondName.add('Gadget');
+
+        int originalCount = original.elements();            // 2
+
+        // When you really do want a separate copy: pack it, then rebuild it
+        Set trueCopy = Set::create(original.pack());
+        trueCopy.add('Gizmo');
+
+        int copyCount      = trueCopy.elements();           // 3
+        int untouchedCount = original.elements();           // still 2
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>
